@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoMod" Version="22.1.29.1" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.1.29.1" />
+    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.1.29.1" />
+    <PackageReference Include="MonoMod.Utils" Version="22.1.29.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\the-anything-gallery\The Anything Gallery_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MMHOOK_Assembly-CSharp">
+      <HintPath>..\..\..\the-anything-gallery-mod-manager\manager-hook\MMHOOK_Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\The Anything Gallery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="mkdir &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-hook&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-hook\$(TargetName).dll&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-hook\$(TargetName).pdb&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).deps.json&quot; &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-hook\$(TargetName).deps.json&quot;" />
+  </Target>
+</Project>

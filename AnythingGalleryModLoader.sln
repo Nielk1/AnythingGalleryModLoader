@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnythingGalleryLoader", "AnythingGalleryLoader\AnythingGalleryLoader.csproj", "{6170EDE9-4176-4B20-BB7A-AAD13432D175}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{7F19D693-7F8D-4D0F-B398-9D80F51B59A7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleImageScanner", "GoogleImageScanner\GoogleImageScanner.csproj", "{DB0836F9-566E-4624-B717-C1687C36CF0E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YouTubeScanner", "YouTubeScanner\YouTubeScanner.csproj", "{302A4FFB-622E-4184-988A-8B2CD11A191A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchiveOrgScanner", "ArchiveOrgScanner\ArchiveOrgScanner.csproj", "{2A429D79-31EF-4327-B9D8-3DE492A1D919}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnythingGalleryModManager", "AnythingGalleryModManager\AnythingGalleryModManager.csproj", "{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6170EDE9-4176-4B20-BB7A-AAD13432D175}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6170EDE9-4176-4B20-BB7A-AAD13432D175}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6170EDE9-4176-4B20-BB7A-AAD13432D175}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6170EDE9-4176-4B20-BB7A-AAD13432D175}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB0836F9-566E-4624-B717-C1687C36CF0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB0836F9-566E-4624-B717-C1687C36CF0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB0836F9-566E-4624-B717-C1687C36CF0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB0836F9-566E-4624-B717-C1687C36CF0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{302A4FFB-622E-4184-988A-8B2CD11A191A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{302A4FFB-622E-4184-988A-8B2CD11A191A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{302A4FFB-622E-4184-988A-8B2CD11A191A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{302A4FFB-622E-4184-988A-8B2CD11A191A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A429D79-31EF-4327-B9D8-3DE492A1D919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A429D79-31EF-4327-B9D8-3DE492A1D919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A429D79-31EF-4327-B9D8-3DE492A1D919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A429D79-31EF-4327-B9D8-3DE492A1D919}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DB0836F9-566E-4624-B717-C1687C36CF0E} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
+		{302A4FFB-622E-4184-988A-8B2CD11A191A} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
+		{2A429D79-31EF-4327-B9D8-3DE492A1D919} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F7B67C42-A782-4425-A255-6CA0248EBFB3}
+	EndGlobalSection
+EndGlobal
