@@ -22,46 +22,9 @@ namespace AnythingGalleryLoader
             {
                 Debug.Log($"Load Library Attempt \"{args.RequestingAssembly}\" requests \"{args.Name}\"");
 
-                //if (File.Exists(args.Name))
-                //    return Assembly.Load(args.Name);
-
-                /*switch (args.RequestingAssembly.GetName().Name)
-                {
-                    case "AnythingGalleryLoader":
-                        {
-                            string LibraryName = args.Name;
-                            if (!LibraryName.EndsWith(".dll"))
-                                LibraryName = LibraryName.Split(',').First() + ".dll";
-                            string candidate = Path.Combine(ModInit.BasePath, Path.GetFileName(LibraryName));
-                            Debug.Log(candidate);
-                            try
-                            {
-                                if (File.Exists(candidate))
-                                    return Assembly.Load(candidate);
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.Log(ex);
-                            }
-                        }
-                        break;
-                }*/
-                /*
-                //Debug.Log(Assembly.GetExecutingAssembly().Location);
-                string LibraryName = args.Name;
-                if (!LibraryName.EndsWith(".dll"))
-                    LibraryName = LibraryName.Split(',').First() + ".dll";
-                string candidate = Path.Combine(ModInit.BasePath, Path.GetFileName(LibraryName));
-                //Debug.Log(candidate);
-                try
-                {
-                    if (File.Exists(candidate))
-                        return Assembly.Load(candidate);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log(ex);
-                }*/
+                string candidate = Path.Combine(ModInit.BasePath, new AssemblyName(args.Name).Name + ".dll");
+                if (File.Exists(candidate))
+                    return Assembly.LoadFile(candidate);
                 return null;
             };
 
@@ -73,6 +36,8 @@ namespace AnythingGalleryLoader
         static bool IsSetup = false;
         static object SetupLock = new object();
 
+        static HashSet<Assembly> ModAssemblies = new HashSet<Assembly>();
+
         static List<IScanner> Scanners = new List<IScanner>();
 
         static List<IScanner> ImageScanUpdateEvent = new List<IScanner>();
@@ -82,6 +47,7 @@ namespace AnythingGalleryLoader
         static List<IImageScanner> ImageScanners = new List<IImageScanner>();
         static List<IRelatedScanner> RelatedScanners = new List<IRelatedScanner>();
         static List<IInfoScanner> InfoScanners = new List<IInfoScanner>();
+
         private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             /*System.Threading.Thread.Sleep(5000);
@@ -93,13 +59,19 @@ namespace AnythingGalleryLoader
 
             // You have to wait until Unity is loaded before interacting with it.
             // The Main method is called before Unity has initialized.
-            if (args.LoadedAssembly.GetType("UnityEngine.Application") != null)
+            //if (args.LoadedAssembly.GetType("UnityEngine.Application") != null)
+            if (args.LoadedAssembly.GetName().Name == "UnityEngine")
             {
-                Debug.Log("Hello from AnythingGalleryLoader!");
+                Debug.Log($"Hello from AnythingGalleryLoader! ({args.LoadedAssembly})");
                 lock (SetupLock)
                 {
                     if (!IsSetup)
                     {
+                        /*foreach (string dll in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "mod_deps"), "*.dll", SearchOption.AllDirectories))
+                        {
+                            KnownDeps[AssemblyName.GetAssemblyName(dll).FullName] = dll;
+                        }*/
+
                         /*{
                             HashSet<string> Deps = new HashSet<string>();
                             string path = Path.Combine(Path.GetDirectoryName(BasePath), "mod_deps");
@@ -156,6 +128,7 @@ namespace AnythingGalleryLoader
                                 {
                                     Assembly loadedAssembly = Assembly.LoadFile(dll);
                                     allAssemblies.Add(loadedAssembly);
+                                    ModAssemblies.Add(loadedAssembly);
                                 }
                                 catch (FileLoadException loadEx)
                                 { } // The Assembly has already been loaded.

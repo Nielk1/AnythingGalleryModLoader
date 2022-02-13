@@ -5,17 +5,17 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MonoMod" Version="22.1.29.1" />
-    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.1.29.1" />
-    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.1.29.1" />
-    <PackageReference Include="MonoMod.Utils" Version="22.1.29.1" />
+    <PackageReference Include="MonoMod" Version="22.2.10.1" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.2.10.1" />
+    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.2.10.1" />
+    <PackageReference Include="MonoMod.Utils" Version="22.2.10.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\the-anything-gallery\The Anything Gallery_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\..\..\the-anything-gallery-mod-manager\manager-hook\MMHOOK_Assembly-CSharp.dll</HintPath>
+      <HintPath>..\the-anything-gallery-mod-manager\manager-hook\MMHOOK_Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\The Anything Gallery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
