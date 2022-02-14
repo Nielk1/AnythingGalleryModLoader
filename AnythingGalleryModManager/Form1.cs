@@ -146,6 +146,8 @@ namespace AnythingGalleryModManager
             lblStatus.Text = "Generating MMHook DLL.";
             MMHookGenerator.GenerateMMHook(Path.Combine(GamePath, @"The Anything Gallery_Data\Managed\Assembly-CSharp.dll"), "manager-hook", GamePath);
             lblStatus.Text = "Loading Mods";
+            if (!Directory.Exists("manager-mods"))
+                Directory.CreateDirectory("manager-mods");
             foreach (string dll in Directory.GetFiles("manager-mods", "*.dll", SearchOption.AllDirectories))
             {
                 try
@@ -177,8 +179,12 @@ namespace AnythingGalleryModManager
 
         private async Task DownloadModDependenciesAsync()
         {
+            if (!Directory.Exists("manager-hook"))
+                Directory.CreateDirectory("manager-hook");
             foreach (string depFile in Directory.EnumerateFiles("manager-hook", "*.deps.json", SearchOption.TopDirectoryOnly))
                 await DownloadDependenciesAsync(depFile);
+            if (!Directory.Exists("manager-mods"))
+                Directory.CreateDirectory("manager-mods");
             foreach (string depFile in Directory.EnumerateFiles("manager-mods", "*.deps.json", SearchOption.TopDirectoryOnly))
                 await DownloadDependenciesAsync(depFile);
         }
@@ -263,7 +269,7 @@ namespace AnythingGalleryModManager
             catch { }
         }
 
-        private async void btnInstallLoader_Click(object sender, EventArgs e)
+        private void btnInstallLoader_Click(object sender, EventArgs e)
         {
             File.Copy(Path.Combine("manager-hook", "winhttp.dll"), Path.Combine(GamePath, "winhttp.dll"), true);
             File.Copy(Path.Combine("manager-hook", "doorstop_config.ini"), Path.Combine(GamePath, "doorstop_config.ini"), true);
@@ -287,6 +293,7 @@ namespace AnythingGalleryModManager
             File.Delete(Path.Combine(GamePath, "doorstop_config.ini"));
 
             Directory.Delete(Path.Combine(GamePath, "mod_deps"), true);
+            Directory.Delete(Path.Combine(GamePath, "mods"), true);
 
             btnInstallLoader.Enabled = true;
             btnUninstallLoader.Enabled = false;
@@ -306,7 +313,12 @@ namespace AnythingGalleryModManager
                 string prefix = clbMods.GetItemText(clbMods.Items[e.Index]);
                 foreach(string file in Directory.EnumerateFiles("manager-mods", prefix + ".*", SearchOption.TopDirectoryOnly))
                 {
-                    File.Copy(file, Path.Combine(GamePath, "mods", Path.GetFileName(file)), true);
+                    if (Directory.Exists(GamePath))
+                    {
+                        if (!Directory.Exists(Path.Combine(GamePath, "mods")))
+                            Directory.CreateDirectory(Path.Combine(GamePath, "mods"));
+                        File.Copy(file, Path.Combine(GamePath, "mods", Path.GetFileName(file)), true);
+                    }
                 }
                 if (File.Exists(Path.Combine("manager-mods", prefix + ".deps.json")))
                     InstallDependencies(Path.Combine("manager-mods", prefix + ".deps.json"));

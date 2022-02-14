@@ -15,7 +15,7 @@
       <HintPath>..\..\..\the-anything-gallery\The Anything Gallery_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\the-anything-gallery-mod-manager\manager-hook\MMHOOK_Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\the-anything-gallery-mod-manager\manager-hook\MMHOOK_Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\..\..\the-anything-gallery\The Anything Gallery_Data\Managed\Unity.TextMeshPro.dll</HintPath>
