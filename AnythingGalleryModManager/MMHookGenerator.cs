@@ -29,16 +29,11 @@ namespace AnythingGalleryModManager
                 ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, "The Anything Gallery_Data", "Managed"));
             }
 
-            /*if (Directory.Exists(Path.Combine(GamePath, JotunnBuildTask.ValheimServerData, "Managed")))
+            if (Directory.Exists(Path.Combine(GamePath, "mod_deps")))
             {
-                ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, JotunnBuildTask.ValheimServerData, JotunnBuildTask.Managed));
-            }*/
-            //((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, "unstripped_corlib"));
+                ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, "mod_deps"));
+            }
 
-            //if (Directory.Exists(Path.Combine(GamePath, "AnythingGalleryLoader")))
-            //{
-            //    ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, "AnythingGalleryLoader"));
-            //}
             if (Directory.Exists("manager-hook"))
             {
                 ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory("manager-hook");
