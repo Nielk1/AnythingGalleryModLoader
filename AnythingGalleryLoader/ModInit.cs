@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -32,10 +33,8 @@ namespace AnythingGalleryLoader
             AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
         }
 
-        static bool IsSetup = false;
-        static object SetupLock = new object();
-
-        static HashSet<Assembly> ModAssemblies = new HashSet<Assembly>();
+        //static bool IsSetup = false;
+        //static object SetupLock = new object();
 
         static List<IScanner> Scanners = new List<IScanner>();
 
@@ -54,25 +53,40 @@ namespace AnythingGalleryLoader
             if (args.LoadedAssembly.GetName().Name == "UnityEngine")
             {
                 Debug.Log($"Hello from AnythingGalleryLoader! ({args.LoadedAssembly})");
-                lock (SetupLock)
+                //lock (SetupLock)
                 {
-                    if (!IsSetup)
+                    //if (!IsSetup)
                     {
+                        Debug.Log($"Applying Hooks");
+                        
+                        Debug.Log($"Hook ImageScraper.MUpdate");
                         On.ImageScraper.MUpdate += ImageScraper_MUpdate;
+                        Debug.Log($"Hook ImageScraper.StartNewQuery");
                         On.ImageScraper.StartNewQuery += ImageScraper_StartNewQuery;
+                        Debug.Log($"Hook ImageScraper.StartNewElaborateQuery");
                         On.ImageScraper.StartNewElaborateQuery += ImageScraper_StartNewElaborateQuery;
+                        Debug.Log($"Hook ImageScraper.ClearData");
                         On.ImageScraper.ClearData += ImageScraper_ClearData;
+                        Debug.Log($"Hook ImageScraper.TryGetURL");
                         On.ImageScraper.TryGetURL += ImageScraper_TryGetURL;
+                        Debug.Log($"Hook ImageScraper.TryGetInfo");
                         On.ImageScraper.TryGetInfo += ImageScraper_TryGetInfo;
+                        Debug.Log($"Hook ImageScraper.TryGetRelatedSearch");
                         On.ImageScraper.TryGetRelatedSearch += ImageScraper_TryGetRelatedSearch;
 
                         // these below hooks somehow break release mode
+                        Debug.Log($"Hook VideoScraper.MUpdate");
                         On.VideoScraper.MUpdate += VideoScraper_MUpdate;
+                        Debug.Log($"Hook VideoScraper.TryGetDirectUrl");
                         On.VideoScraper.TryGetDirectUrl += VideoScraper_TryGetDirectUrl;
+                        Debug.Log($"Hook VideoScraper.StartNewQuery");
                         On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
 
+                        Debug.Log($"Hook RequestManager.Show");
                         On.RequestManager.Show += RequestManager_Show;
                         
+                        Debug.Log($"Collecting Mods");
+
                         try
                         {
                             List<Assembly> allAssemblies = new List<Assembly>();
@@ -85,7 +99,6 @@ namespace AnythingGalleryLoader
                                 {
                                     Assembly loadedAssembly = Assembly.LoadFile(dll);
                                     allAssemblies.Add(loadedAssembly);
-                                    ModAssemblies.Add(loadedAssembly);
                                 }
                                 catch (FileLoadException loadEx)
                                 { } // The Assembly has already been loaded.
@@ -153,7 +166,7 @@ namespace AnythingGalleryLoader
                             Debug.Log(ex);
                         }
 
-                        IsSetup = true;
+                        //IsSetup = true;
                     }
                 }
             }
