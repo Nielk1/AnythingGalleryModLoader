@@ -29,10 +29,10 @@ namespace AnythingGalleryModManager
                 ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, "The Anything Gallery_Data", "Managed"));
             }
 
-            if (Directory.Exists(Path.Combine(GamePath, "mod_deps")))
+            /*if (Directory.Exists(Path.Combine(GamePath, "mod_deps")))
             {
                 ((BaseAssemblyResolver)modder.AssemblyResolver)?.AddSearchDirectory(Path.Combine(GamePath, "mod_deps"));
-            }
+            }*/
 
             if (Directory.Exists("manager-hook"))
             {

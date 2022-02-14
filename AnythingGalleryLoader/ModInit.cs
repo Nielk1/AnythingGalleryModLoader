@@ -22,7 +22,7 @@ namespace AnythingGalleryLoader
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
-                Debug.Log($"Load Library Attempt \"{args.RequestingAssembly}\" requests \"{args.Name}\"");
+                //Debug.Log($"Load Library Attempt \"{args.RequestingAssembly}\" requests \"{args.Name}\"");
 
                 string candidate = Path.Combine(ModInit.BasePath, new AssemblyName(args.Name).Name + ".dll");
                 if (File.Exists(candidate))
@@ -32,9 +32,6 @@ namespace AnythingGalleryLoader
 
             AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
         }
-
-        //static bool IsSetup = false;
-        //static object SetupLock = new object();
 
         static List<IScanner> Scanners = new List<IScanner>();
 
@@ -52,124 +49,112 @@ namespace AnythingGalleryLoader
             // The Main method is called before Unity has initialized.
             if (args.LoadedAssembly.GetName().Name == "UnityEngine")
             {
-                Debug.Log($"Hello from AnythingGalleryLoader! ({args.LoadedAssembly})");
-                //lock (SetupLock)
+                Debug.Log($"Hello from AnythingGalleryLoader!");
+
+                // TODO find a way to do this more reliably, but without this non-dev UnityPlayer.dll crashes
+                new Thread(() =>
                 {
-                    //if (!IsSetup)
+                    Thread.Sleep(1000);
+
+                    On.ImageScraper.MUpdate += ImageScraper_MUpdate;
+                    On.ImageScraper.StartNewQuery += ImageScraper_StartNewQuery;
+                    On.ImageScraper.StartNewElaborateQuery += ImageScraper_StartNewElaborateQuery;
+                    On.ImageScraper.ClearData += ImageScraper_ClearData;
+                    On.ImageScraper.TryGetURL += ImageScraper_TryGetURL;
+                    On.ImageScraper.TryGetInfo += ImageScraper_TryGetInfo;
+                    On.ImageScraper.TryGetRelatedSearch += ImageScraper_TryGetRelatedSearch;
+
+                    On.VideoScraper.MUpdate += VideoScraper_MUpdate;
+                    On.VideoScraper.TryGetDirectUrl += VideoScraper_TryGetDirectUrl;
+                    On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
+
+                    On.RequestManager.Show += RequestManager_Show;
+                }).Start();
+
+                try
+                {
+                    List<Assembly> allAssemblies = new List<Assembly>();
+                    allAssemblies.Add(typeof(IImageScanner).GetTypeInfo().Assembly);
+                    string path = Path.Combine(Path.GetDirectoryName(BasePath), "mods");
+
+                    foreach (string dll in Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories))
                     {
-                        Debug.Log($"Applying Hooks");
-                        
-                        Debug.Log($"Hook ImageScraper.MUpdate");
-                        On.ImageScraper.MUpdate += ImageScraper_MUpdate;
-                        Debug.Log($"Hook ImageScraper.StartNewQuery");
-                        On.ImageScraper.StartNewQuery += ImageScraper_StartNewQuery;
-                        Debug.Log($"Hook ImageScraper.StartNewElaborateQuery");
-                        On.ImageScraper.StartNewElaborateQuery += ImageScraper_StartNewElaborateQuery;
-                        Debug.Log($"Hook ImageScraper.ClearData");
-                        On.ImageScraper.ClearData += ImageScraper_ClearData;
-                        Debug.Log($"Hook ImageScraper.TryGetURL");
-                        On.ImageScraper.TryGetURL += ImageScraper_TryGetURL;
-                        Debug.Log($"Hook ImageScraper.TryGetInfo");
-                        On.ImageScraper.TryGetInfo += ImageScraper_TryGetInfo;
-                        Debug.Log($"Hook ImageScraper.TryGetRelatedSearch");
-                        On.ImageScraper.TryGetRelatedSearch += ImageScraper_TryGetRelatedSearch;
-
-                        // these below hooks somehow break release mode
-                        Debug.Log($"Hook VideoScraper.MUpdate");
-                        On.VideoScraper.MUpdate += VideoScraper_MUpdate;
-                        Debug.Log($"Hook VideoScraper.TryGetDirectUrl");
-                        On.VideoScraper.TryGetDirectUrl += VideoScraper_TryGetDirectUrl;
-                        Debug.Log($"Hook VideoScraper.StartNewQuery");
-                        On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
-
-                        Debug.Log($"Hook RequestManager.Show");
-                        On.RequestManager.Show += RequestManager_Show;
-                        
-                        Debug.Log($"Collecting Mods");
-
                         try
                         {
-                            List<Assembly> allAssemblies = new List<Assembly>();
-                            allAssemblies.Add(typeof(IImageScanner).GetTypeInfo().Assembly);
-                            string path = Path.Combine(Path.GetDirectoryName(BasePath), "mods");
+                            Assembly loadedAssembly = Assembly.LoadFile(dll);
+                            allAssemblies.Add(loadedAssembly);
+                        }
+                        catch (FileLoadException loadEx)
+                        { } // The Assembly has already been loaded.
+                        catch (BadImageFormatException imgEx)
+                        { } // If a BadImageFormatException exception is thrown, the file is not an assembly.
 
-                            foreach (string dll in Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories))
+                    } // foreach dll
+
+                    foreach (Assembly asm in allAssemblies)
+                    {
+                        try
+                        {
+                            bool LoadedAssembly = false;
+                            foreach (Type item in asm.GetTypes())
                             {
-                                try
+                                //if (!item.IsClass) continue;
+                                if (item.GetInterfaces().Contains(typeof(IScanner)))
                                 {
-                                    Assembly loadedAssembly = Assembly.LoadFile(dll);
-                                    allAssemblies.Add(loadedAssembly);
-                                }
-                                catch (FileLoadException loadEx)
-                                { } // The Assembly has already been loaded.
-                                catch (BadImageFormatException imgEx)
-                                { } // If a BadImageFormatException exception is thrown, the file is not an assembly.
-
-                            } // foreach dll
-
-                            foreach (Assembly asm in allAssemblies)
-                            {
-                                try
-                                {
-                                    bool LoadedAssembly = false;
-                                    foreach (Type item in asm.GetTypes())
+                                    if (!LoadedAssembly)
                                     {
-                                        //if (!item.IsClass) continue;
-                                        if (item.GetInterfaces().Contains(typeof(IScanner)))
+                                        LoadedAssembly = true;
+                                    }
+                                    ConstructorInfo[] cons = item.GetConstructors();
+                                    foreach (ConstructorInfo con in cons)
+                                    {
+                                        try
                                         {
-                                            if (!LoadedAssembly)
-                                            {
-                                                LoadedAssembly = true;
-                                            }
-                                            ConstructorInfo[] cons = item.GetConstructors();
-                                            foreach (ConstructorInfo con in cons)
-                                            {
-                                                try
-                                                {
-                                                    ParameterInfo[] @params = con.GetParameters();
-                                                    object[] paramList = new object[@params.Length];
-                                                    // don't worry about paramaters for now
-                                                    //for (int i = 0; i < @params.Length; i++)
-                                                    //{
-                                                    //    paramList[i] = ServiceProvider.GetService(@params[i].ParameterType);
-                                                    //}
+                                            ParameterInfo[] @params = con.GetParameters();
+                                            object[] paramList = new object[@params.Length];
+                                            // don't worry about paramaters for now
+                                            //for (int i = 0; i < @params.Length; i++)
+                                            //{
+                                            //    paramList[i] = ServiceProvider.GetService(@params[i].ParameterType);
+                                            //}
 
-                                                    IScanner scannerObject = (IScanner)Activator.CreateInstance(item, paramList);
-                                                    Scanners.Add(scannerObject);
-                                                    bool sawNonVideoScanner = false;
-                                                    if (scannerObject is IImageScanner) { ImageScanners.Add((IImageScanner)scannerObject); sawNonVideoScanner = true; }
-                                                    if (scannerObject is IRelatedScanner) { RelatedScanners.Add((IRelatedScanner)scannerObject); sawNonVideoScanner = true; }
-                                                    if (scannerObject is IInfoScanner) { InfoScanners.Add((IInfoScanner)scannerObject); sawNonVideoScanner = true; }
-                                                    if (scannerObject is IVideoScanner) { VideoScanners.Add((IVideoScanner)scannerObject); }
-                                                    if (sawNonVideoScanner)
-                                                    {
-                                                        ImageScanUpdateEvent.Add(scannerObject);
-                                                    }
-                                                    else
-                                                    {
-                                                        // not sure what the deal is with differnt update triggers, so we're ggoing to stuff video only providers into the video scanner update event to be safe
-                                                        VideoScanUpdateEvent.Add(scannerObject);
-                                                    }
-
-                                                    break;
-                                                }
-                                                catch { }
+                                            IScanner scannerObject = (IScanner)Activator.CreateInstance(item, paramList);
+                                            Scanners.Add(scannerObject);
+                                            bool sawNonVideoScanner = false;
+                                            if (scannerObject is IImageScanner) { ImageScanners.Add((IImageScanner)scannerObject); sawNonVideoScanner = true; }
+                                            if (scannerObject is IRelatedScanner) { RelatedScanners.Add((IRelatedScanner)scannerObject); sawNonVideoScanner = true; }
+                                            if (scannerObject is IInfoScanner) { InfoScanners.Add((IInfoScanner)scannerObject); sawNonVideoScanner = true; }
+                                            if (scannerObject is IVideoScanner) { VideoScanners.Add((IVideoScanner)scannerObject); }
+                                            if (sawNonVideoScanner)
+                                            {
+                                                ImageScanUpdateEvent.Add(scannerObject);
                                             }
+                                            else
+                                            {
+                                                // not sure what the deal is with differnt update triggers, so we're ggoing to stuff video only providers into the video scanner update event to be safe
+                                                VideoScanUpdateEvent.Add(scannerObject);
+                                            }
+
+                                            break;
                                         }
+                                        catch { }
                                     }
                                 }
-                                catch { }
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.Log(ex);
-                        }
-
-                        //IsSetup = true;
+                        catch { }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Debug.Log(ex);
+                }
             }
+        }
+
+        private static void PlayerController_Start(On.PlayerController.orig_Start orig, PlayerController self)
+        {
+            throw new NotImplementedException();
         }
 
         private static void RequestManager_Show(On.RequestManager.orig_Show orig, bool visible)
@@ -186,9 +171,6 @@ namespace AnythingGalleryLoader
                 inputField.ActivateInputField();
             }
         }
-
-
-
 
         private static void VideoScraper_MUpdate(On.VideoScraper.orig_MUpdate orig, VideoScraper self)
         {
@@ -215,9 +197,6 @@ namespace AnythingGalleryLoader
                 scanner.StartNewQuery(query);
             }
         }
-
-
-
 
         private static void ImageScraper_MUpdate(On.ImageScraper.orig_MUpdate orig, ImageScraper self)
         {
