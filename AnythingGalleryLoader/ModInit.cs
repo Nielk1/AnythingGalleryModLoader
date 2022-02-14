@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 
 namespace AnythingGalleryLoader
@@ -116,6 +117,8 @@ namespace AnythingGalleryLoader
                         On.VideoScraper.TryGetDirectUrl += VideoScraper_TryGetDirectUrl;
                         On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
 
+                        On.RequestManager.Show += RequestManager_Show;
+
                         try
                         {
                             List<Assembly> allAssemblies = new List<Assembly>();
@@ -201,6 +204,26 @@ namespace AnythingGalleryLoader
                 }
             }
         }
+
+        private static void RequestManager_Show(On.RequestManager.orig_Show orig, bool visible)
+        {
+            orig(visible);
+            if (visible)
+            {
+                Type type = typeof(RequestManager);
+                FieldInfo info = type.GetField("instance", BindingFlags.NonPublic | BindingFlags.Static);
+                RequestManager value = (RequestManager)info.GetValue(null);
+
+                //FieldInfo info2 = type.GetField("inputField", BindingFlags.NonPublic | BindingFlags.Instance);
+                //TMP_InputField inputField = (TMP_InputField)info2.GetValue(null);
+                TMP_InputField inputField = value.inputField;
+
+                inputField.ActivateInputField();
+            }
+        }
+
+
+
 
         private static void VideoScraper_MUpdate(On.VideoScraper.orig_MUpdate orig, VideoScraper self)
         {

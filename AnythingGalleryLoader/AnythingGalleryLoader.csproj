@@ -17,8 +17,14 @@
     <Reference Include="MMHOOK_Assembly-CSharp">
       <HintPath>..\the-anything-gallery-mod-manager\manager-hook\MMHOOK_Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>..\..\..\the-anything-gallery\The Anything Gallery_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\The Anything Gallery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\The Anything Gallery_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
