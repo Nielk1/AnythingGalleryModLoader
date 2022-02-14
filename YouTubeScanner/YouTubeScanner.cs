@@ -152,7 +152,7 @@ namespace YouTubeScanner
                 if (formatData != null)
                 {
                     lock (directUrls)
-                        directUrls.Add((formatData.url, data.title));
+                        directUrls.Add((formatData.url, $"{data.title}\r\n\r\nyt://{data.id}"));
                 }
             }
 

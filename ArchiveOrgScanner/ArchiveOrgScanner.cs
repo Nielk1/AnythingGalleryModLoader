@@ -28,7 +28,9 @@ namespace ArchiveOrgScanner
         private List<(string VideoUrl, string Title)> VideoItems = new List<(string VideoUrl, string Title)>();
         private Queue<string> outstandingSourceUrls;
         private static HttpWebRequest request;
-        private bool isLoadingSource;
+        //private bool isLoadingSource;
+        private int isLoadingSourceCount;
+        const int LOADING_SOURCE_MAX = 10;
         public ArchiveOrgScanner()
         {
             page = 1;
@@ -41,10 +43,12 @@ namespace ArchiveOrgScanner
         }
         public void MUpdate()
         {
-            if (!isLoadingSource && outstandingSourceUrls.Count > 0)
+            //if (!isLoadingSource && outstandingSourceUrls.Count > 0)
+            if (isLoadingSourceCount < LOADING_SOURCE_MAX && outstandingSourceUrls.Count > 0)
             {
                 string id = outstandingSourceUrls.Dequeue();
-                isLoadingSource = true;
+                //isLoadingSource = true;
+                isLoadingSourceCount++;
                 //MonoBehaviour.print("Loading");
                 LoadInfo(id);
             }
@@ -183,6 +187,11 @@ namespace ArchiveOrgScanner
         }
 
 
+        /// <summary>
+        /// we are assuming as these are Coroutines that they are not going to parallel access the collections, if they do we will need to add locks to the collections
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private IEnumerator InternalLoadInfo(string id)
         {
             UnityWebRequest request = UnityWebRequest.Get($"https://archive.org/details/{id}?output=json");
@@ -227,7 +236,16 @@ namespace ArchiveOrgScanner
 
                                 if (!string.IsNullOrWhiteSpace(url))
                                 {
-                                    Images.Add((url, title ?? string.Empty));
+                                    if (string.IsNullOrWhiteSpace(title))
+                                    {
+                                        Images.Add((url, $"ia://{id}"));
+                                    }
+                                    else
+                                    {
+                                        Images.Add((url, $"{title}\r\n\r\nia://{id}"));
+                                    }
+
+                                    yield return null;
 
                                     if (!string.IsNullOrWhiteSpace(description))
                                     {
@@ -243,7 +261,7 @@ namespace ArchiveOrgScanner
                                                 value = value.Replace("</p>", "");
                                                 if (value.Length >= 200)
                                                 {
-                                                    tuple.Paragraphs.Add(value);
+                                                    tuple.Paragraphs.Add($"{value}\r\n\r\nia://{id}");
                                                 }
                                             }
                                             if (tuple.Paragraphs.Count > 0)
@@ -279,7 +297,14 @@ namespace ArchiveOrgScanner
                                 if(filename != null)
                                 {
                                     string url = "https://archive.org" + dir + filename;
-                                    VideoItems.Add((url, title));
+                                    if (string.IsNullOrWhiteSpace(title))
+                                    {
+                                        VideoItems.Add((url, $"ia://{id}"));
+                                    }
+                                    else
+                                    {
+                                        VideoItems.Add((url, $"{title}\r\n\r\nia://{id}"));
+                                    }
                                 }
 
                             }
@@ -287,7 +312,8 @@ namespace ArchiveOrgScanner
                     }
                 }
             }
-            isLoadingSource = false;
+            //isLoadingSource = false;
+            isLoadingSourceCount--;
         }
 
 

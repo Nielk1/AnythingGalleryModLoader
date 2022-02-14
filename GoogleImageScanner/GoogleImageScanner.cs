@@ -339,7 +339,7 @@ namespace GoogleImageScanner
                     value = value.Replace("</p>", "");
                     if (value.Length >= 200)
                     {
-                        tuple.Paragraphs.Add(value);
+                        tuple.Paragraphs.Add($"{value}\r\n\r\n{url}");
                     }
                 }
                 if (tuple.Paragraphs.Count > 0)
