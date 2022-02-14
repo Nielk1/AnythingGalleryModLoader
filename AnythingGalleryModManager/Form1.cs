@@ -113,7 +113,7 @@ namespace AnythingGalleryModManager
             "UnityEngine.XRModule.dll",
         };
 
-        bool started = false;
+        bool EnableCheckLogic = false;
         string GamePath = null;
         WebClient client;
         public Form1()
@@ -160,7 +160,7 @@ namespace AnythingGalleryModManager
                 { } // If a BadImageFormatException exception is thrown, the file is not an assembly.
 
             } // foreach dll
-            started = true;
+            EnableCheckLogic = true;
             lblStatus.Text = "Checking for Mod Loader install.";
             if (File.Exists(Path.Combine(GamePath, "winhttp.dll")))
             {
@@ -289,22 +289,26 @@ namespace AnythingGalleryModManager
 
         private void btnUninstallLoader_Click(object sender, EventArgs e)
         {
+            EnableCheckLogic = false;
             File.Delete(Path.Combine(GamePath, "winhttp.dll"));
             File.Delete(Path.Combine(GamePath, "doorstop_config.ini"));
 
-            Directory.Delete(Path.Combine(GamePath, "mod_deps"), true);
-            Directory.Delete(Path.Combine(GamePath, "mods"), true);
+            if (Directory.Exists(Path.Combine(GamePath, "mod_deps")))
+                Directory.Delete(Path.Combine(GamePath, "mod_deps"), true);
+            if (Directory.Exists(Path.Combine(GamePath, "mods")))
+                Directory.Delete(Path.Combine(GamePath, "mods"), true);
 
             btnInstallLoader.Enabled = true;
             btnUninstallLoader.Enabled = false;
             clbMods.Enabled = false;
             for (int i = 0; i < clbMods.Items.Count; i++)
                 clbMods.SetItemChecked(i, false);
+            EnableCheckLogic = true;
         }
 
         private void clbMods_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (!started)
+            if (!EnableCheckLogic)
                 return;
             if (e.NewValue == e.CurrentValue)
                 return;
