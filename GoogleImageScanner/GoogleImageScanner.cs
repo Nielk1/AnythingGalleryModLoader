@@ -261,19 +261,25 @@ namespace GoogleImageScanner
                             if (!string.IsNullOrWhiteSpace(href))
                                 try
                                 {
-                                    href = HttpUtility.ParseQueryString(new Uri(href).Query)["q"]?.Trim();
+                                    href = HttpUtility.ParseQueryString(new Uri("http://localhost" + href).Query)["url"]?.Trim();
                                 }
-                                catch
-                                {
-                                    try
-                                    {
-                                        href = HttpUtility.ParseQueryString(new Uri("http://localhost" + href).Query)["url"]?.Trim();
-                                    }
-                                    catch { }
-                                }
+                                catch { }
                             if (!string.IsNullOrWhiteSpace(href))
                                 outstandingSourceUrls.Enqueue((Title, href));
-                            imageUrls.Add((url, Title));
+
+
+                            var Qry = HttpUtility.ParseQueryString(request.RequestUri.Query);
+                            string q_q = Qry["q"]?.Trim();
+                            string q_start = Qry["start"]?.Trim();
+
+                            if (string.IsNullOrWhiteSpace(Title))
+                            {
+                                imageUrls.Add((url, $"gogl://q={q_q}&start={q_start}"));
+                            }
+                            else
+                            {
+                                imageUrls.Add((url, $"{Title}\r\n\r\ngogl://q={q_q}&start={q_start}"));
+                            }
 
                             SearchResultsFound = true;
                             iterationProcessed = true;
