@@ -146,10 +146,6 @@ namespace ArchiveOrgScanner
         }
         private void FinishedResponse(IAsyncResult result)
         {
-            //RelatedList.Clear();
-            //Related.Clear();
-            //Images.Clear();
-            //infoParagraphs.Clear();
             using (HttpWebResponse httpWebResponse = (HttpWebResponse)request.EndGetResponse(result))
             using (Stream stream = httpWebResponse.GetResponseStream())
             using (StreamReader streamReader = new StreamReader(stream))

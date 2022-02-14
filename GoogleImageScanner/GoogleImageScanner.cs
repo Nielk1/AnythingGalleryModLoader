@@ -135,7 +135,6 @@ namespace GoogleImageScanner
         }
         #endregion InfoScanner
 
-
         #region RelatedScanner
         public bool TryGetRelatedQuery(out string relatedSearch)
         {
@@ -180,16 +179,10 @@ namespace GoogleImageScanner
         private void FinishedResponse(IAsyncResult result)
         {
             string empty = string.Empty;
-            //imageUrls.Clear();
-            //relatedQueries.Clear();
-            //infoParagraphs.Clear();
-            //outstandingSourceUrls.Clear();
             IHtmlDocument doc;
             using (HttpWebResponse httpWebResponse = (HttpWebResponse)request.EndGetResponse(result))
             using (Stream stream = httpWebResponse.GetResponseStream())
-            //using (StreamReader streamReader = new StreamReader(stream))
             {
-                //empty = streamReader.ReadToEnd();
                 var parser = new HtmlParser();//System.ArgumentException
                 doc = parser.ParseDocument(stream);
             }
@@ -200,7 +193,6 @@ namespace GoogleImageScanner
                 {
                     foreach (IAttr attr in elem.Attributes)
                     {
-                        //if(attr.Name.StartsWith("data-"))
                         {
                             string key = attr.Name + ":" + attr.Value;
                             if (!DataCache.ContainsKey(key))
@@ -210,8 +202,6 @@ namespace GoogleImageScanner
                     }
                 }
                 List<HashSet<IElement>> Candidates = DataCache.OrderByDescending(dr => dr.Value.Count).Select(dr => dr.Value).ToList();
-                //HashSet<IElement> MostPopularElemByData = DataCache.OrderByDescending(dr => dr.Value.Count).Select(dr => dr.Value).FirstOrDefault();
-                //if (MostPopularElemByData != null)
                 bool SearchResultsFound = false;
                 bool RelatedSearchFound = false;
                 HashSet<IElement> UsedElements = new HashSet<IElement>();
@@ -248,15 +238,6 @@ namespace GoogleImageScanner
                             }
 
                             Title = textInfo.ToTitleCase(Title ?? item.TextContent ?? string.Empty);
-                            //Match match2 = Regex.Match(html, ",\"https://(.*?)\",");
-                            //string empty2 = string.Empty;
-                            //if (match2.Value.Length > 0)
-                            //{
-                            //    empty2 = match2.Value;
-                            //    empty2 = empty2.Replace("\"", "");
-                            //    empty2 = empty2.Replace(",", "");
-                            //    outstandingSourceUrls.Enqueue(new Tuple<string, string>(Title, empty2));
-                            //}
                             string href = item.QuerySelectorAll("[href]").Select(dr => dr.Attributes["href"].Value).Where(dr => dr.Contains(@"&url=")).OrderByDescending(dr => dr.Length).FirstOrDefault()?.Trim();
                             if (!string.IsNullOrWhiteSpace(href))
                                 try

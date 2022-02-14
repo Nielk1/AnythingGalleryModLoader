@@ -18,8 +18,6 @@ namespace YouTubeScanner
         private int urlIdx;
         private bool hasLoadedVideoUrls;
         private bool isLoadingUrl;
-        private string Title = string.Empty;
-        private TextInfo textInfo;
         private static HttpWebRequest request;
         private YoutubeDlContext ytdl;
         private bool ytdl_updated;
@@ -28,7 +26,6 @@ namespace YouTubeScanner
         #region Scanner
         public YouTubeScanner()
         {
-            textInfo = new CultureInfo("en-US", useUserOverride: false).TextInfo;
             ytdl = YoutubeDlContext.Instance;
             ytdl_busy = false;
         }
@@ -44,7 +41,6 @@ namespace YouTubeScanner
                 ytdl_busy = true;
                 (string Url, string Title) tuple = videoUrls.Dequeue();
                 DirectUrlFromUrl(tuple.Url);
-                Title = tuple.Title;
                 isLoadingUrl = true;
             }
         }

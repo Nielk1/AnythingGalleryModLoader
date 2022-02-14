@@ -30,8 +30,6 @@ namespace AnythingGalleryLoader
             };
 
             AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
-
-            //MMHookGenerator.GenerateMMHook(@"Assembly-CSharp.dll", "MMHOOK", @"D:\itch\apps\the-anything-gallery");
         }
 
         static bool IsSetup = false;
@@ -51,16 +49,8 @@ namespace AnythingGalleryLoader
 
         private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
-            /*System.Threading.Thread.Sleep(5000);
-            try
-            {
-                Debug.Log(args.LoadedAssembly.Location);
-            }
-            catch { }*/
-
             // You have to wait until Unity is loaded before interacting with it.
             // The Main method is called before Unity has initialized.
-            //if (args.LoadedAssembly.GetType("UnityEngine.Application") != null)
             if (args.LoadedAssembly.GetName().Name == "UnityEngine")
             {
                 Debug.Log($"Hello from AnythingGalleryLoader! ({args.LoadedAssembly})");
@@ -68,57 +58,21 @@ namespace AnythingGalleryLoader
                 {
                     if (!IsSetup)
                     {
-                        /*foreach (string dll in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "mod_deps"), "*.dll", SearchOption.AllDirectories))
-                        {
-                            KnownDeps[AssemblyName.GetAssemblyName(dll).FullName] = dll;
-                        }*/
-
-                        /*{
-                            HashSet<string> Deps = new HashSet<string>();
-                            string path = Path.Combine(Path.GetDirectoryName(BasePath), "mod_deps");
-                            foreach (string dll in Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories))
-                                Deps.Add(dll);
-
-                            for (; ; )
-                            {
-                                HashSet<string> Deps2 = new HashSet<string>();
-                                bool foundAny = false;
-                                foreach (string dll in Deps)
-                                {
-                                    try
-                                    {
-                                        Assembly loadedAssembly = Assembly.LoadFile(dll);
-                                        foundAny = true;
-                                    }
-                                    catch
-                                    {
-                                        Deps2.Add(dll);
-                                    }
-                                }
-                                Deps = Deps2;
-                                if (!foundAny || Deps.Count == 0)
-                                    break;
-                            }
-                        }*/
-
-                        //MMHookGenerator.GenerateMMHook(@"The Anything Gallery_Data\Managed\Assembly-CSharp.dll", BasePath, Path.GetDirectoryName(BasePath));
-
-                        //On.ImageScraper.CleanQuery += ImageScraper_CleanQuery;
                         On.ImageScraper.MUpdate += ImageScraper_MUpdate;
                         On.ImageScraper.StartNewQuery += ImageScraper_StartNewQuery;
                         On.ImageScraper.StartNewElaborateQuery += ImageScraper_StartNewElaborateQuery;
                         On.ImageScraper.ClearData += ImageScraper_ClearData;
-                        //On.ImageScraper.LoadUrls += ImageScraper_LoadUrls;
                         On.ImageScraper.TryGetURL += ImageScraper_TryGetURL;
                         On.ImageScraper.TryGetInfo += ImageScraper_TryGetInfo;
                         On.ImageScraper.TryGetRelatedSearch += ImageScraper_TryGetRelatedSearch;
 
+                        // these below hooks somehow break release mode
                         On.VideoScraper.MUpdate += VideoScraper_MUpdate;
                         On.VideoScraper.TryGetDirectUrl += VideoScraper_TryGetDirectUrl;
                         On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
 
                         On.RequestManager.Show += RequestManager_Show;
-
+                        
                         try
                         {
                             List<Assembly> allAssemblies = new List<Assembly>();
@@ -214,8 +168,6 @@ namespace AnythingGalleryLoader
                 FieldInfo info = type.GetField("instance", BindingFlags.NonPublic | BindingFlags.Static);
                 RequestManager value = (RequestManager)info.GetValue(null);
 
-                //FieldInfo info2 = type.GetField("inputField", BindingFlags.NonPublic | BindingFlags.Instance);
-                //TMP_InputField inputField = (TMP_InputField)info2.GetValue(null);
                 TMP_InputField inputField = value.inputField;
 
                 inputField.ActivateInputField();
@@ -312,7 +264,6 @@ namespace AnythingGalleryLoader
             return false;
         }
 
-        // TODO consider getting all related and then combinding and de-duping them
         private static bool ImageScraper_TryGetRelatedSearch(On.ImageScraper.orig_TryGetRelatedSearch orig, out string relatedSearch)
         {
             foreach (IRelatedScanner scanner in RelatedScanners.Shuffle())
