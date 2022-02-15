@@ -127,11 +127,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>mkdir "$(SolutionDir)the-anything-gallery-mod-manager\manager-hook"
-copy /Y "$(TargetDir)manager-hook\*" "$(SolutionDir)the-anything-gallery-mod-manager\manager-hook\"
-copy /Y "$(TargetDir)$(TargetName).exe" "$(SolutionDir)the-anything-gallery-mod-manager\$(TargetName).exe"
-copy /Y "$(TargetDir)$(TargetName).exe.config" "$(SolutionDir)the-anything-gallery-mod-manager\$(TargetName).exe.config"
-copy /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)the-anything-gallery-mod-manager\$(TargetName).pdb"
-copy /Y "$(TargetDir)*" "$(SolutionDir)the-anything-gallery-mod-manager\"</PostBuildEvent>
+    <PostBuildEvent>mkdir "$(SolutionDir)test\the-anything-gallery-mod-manager\manager-hook"
+mkdir "$(SolutionDir)publish\the-anything-gallery-mod-manager\manager-hook"
+copy /Y "$(TargetDir)manager-hook\*" "$(SolutionDir)test\the-anything-gallery-mod-manager\manager-hook\"
+copy /Y "$(TargetDir)manager-hook\*" "$(SolutionDir)publish\the-anything-gallery-mod-manager\manager-hook\"
+copy /Y "$(TargetDir)$(TargetName).exe" "$(SolutionDir)test\the-anything-gallery-mod-manager\$(TargetName).exe"
+copy /Y "$(TargetDir)$(TargetName).exe" "$(SolutionDir)publish\the-anything-gallery-mod-manager\$(TargetName).exe"
+copy /Y "$(TargetDir)$(TargetName).exe.config" "$(SolutionDir)test\the-anything-gallery-mod-manager\$(TargetName).exe.config"
+copy /Y "$(TargetDir)$(TargetName).exe.config" "$(SolutionDir)publish\the-anything-gallery-mod-manager\$(TargetName).exe.config"
+copy /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)test\the-anything-gallery-mod-manager\$(TargetName).pdb"
+copy /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)publish\the-anything-gallery-mod-manager\$(TargetName).pdb"
+copy /Y "$(TargetDir)*" "$(SolutionDir)test\the-anything-gallery-mod-manager\"
+copy /Y "$(TargetDir)*" "$(SolutionDir)publish\the-anything-gallery-mod-manager\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -19,18 +19,18 @@
 
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\The Anything Gallery_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\test\the-anything-gallery\The Anything Gallery_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\The Anything Gallery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\test\the-anything-gallery\The Anything Gallery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>..\..\The Anything Gallery_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>..\test\the-anything-gallery\The Anything Gallery_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mkdir &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-mods&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-mods\$(TargetName).dll&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-mods\$(TargetName).pdb&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).deps.json&quot; &quot;$(SolutionDir)the-anything-gallery-mod-manager\manager-mods\$(TargetName).deps.json&quot;" />
+    <Exec Command="if not exist &quot;$(SolutionDir)test\the-anything-gallery-mod-manager\manager-mods&quot; mkdir &quot;$(SolutionDir)test\the-anything-gallery-mod-manager\manager-mods&quot;&#xD;&#xA;if not exist &quot;$(SolutionDir)publish\the-anything-gallery-mod-manager\manager-mods&quot; mkdir &quot;$(SolutionDir)publish\the-anything-gallery-mod-manager\manager-mods&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).*&quot; &quot;$(SolutionDir)test\the-anything-gallery-mod-manager\manager-mods\&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).*&quot; &quot;$(SolutionDir)publish\the-anything-gallery-mod-manager\manager-mods\&quot;" />
   </Target>
 
 </Project>

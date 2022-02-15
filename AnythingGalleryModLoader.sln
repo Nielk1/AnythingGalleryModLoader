@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnythingGalleryLoader", "AnythingGalleryLoader\AnythingGalleryLoader.csproj", "{6170EDE9-4176-4B20-BB7A-AAD13432D175}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C} = {9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{7F19D693-7F8D-4D0F-B398-9D80F51B59A7}"
 EndProject

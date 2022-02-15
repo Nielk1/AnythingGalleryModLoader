@@ -396,4 +396,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-the-anything-gallery-mod-manager/
+
+
+# customizations
+test/the-anything-gallery-mod-manager/*
+test/the-anything-gallery/*
+!test/the-anything-gallery/gamehere.txt
+publish/

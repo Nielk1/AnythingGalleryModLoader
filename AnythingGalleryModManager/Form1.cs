@@ -119,19 +119,25 @@ namespace AnythingGalleryModManager
         public Form1()
         {
             InitializeComponent();
+            GamePath = GetGamePath();
+            client = new WebClient();
+        }
+
+        public static string GetGamePath()
+        {
             if (File.Exists("The Anything Gallery.exe"))
             {
-                GamePath = Path.Combine(Directory.GetCurrentDirectory());
+                return Path.Combine(Directory.GetCurrentDirectory());
             }
             else if (File.Exists(Path.Combine("..", "The Anything Gallery.exe")))
             {
-                GamePath = Path.Combine(Directory.GetCurrentDirectory(), "..");
+                return Path.Combine(Directory.GetCurrentDirectory(), "..");
             }
             else if (File.Exists(Path.Combine("..", "the-anything-gallery", "The Anything Gallery.exe")))
             {
-                GamePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "the-anything-gallery");
+                return Path.Combine(Directory.GetCurrentDirectory(), "..", "the-anything-gallery");
             }
-            client = new WebClient();
+            return null;
         }
 
         private async void Form1_Load(object sender, EventArgs e)
@@ -144,7 +150,7 @@ namespace AnythingGalleryModManager
             lblStatus.Text = "Downloading Injector and Mod dependencies.";
             await DownloadModDependenciesAsync();
             lblStatus.Text = "Generating MMHook DLL.";
-            MMHookGenerator.GenerateMMHook(Path.Combine(GamePath, @"The Anything Gallery_Data\Managed\Assembly-CSharp.dll"), "manager-hook", GamePath);
+            MMHookGenerator.GenerateMMHook(Path.Combine(GamePath, @"The Anything Gallery_Data\Managed\Assembly-CSharp.dll"), Path.Combine("manager-hook", $"MMHOOK_Assembly-CSharp.dll"), GamePath);
             lblStatus.Text = "Loading Mods";
             if (!Directory.Exists("manager-mods"))
                 Directory.CreateDirectory("manager-mods");
@@ -276,7 +282,10 @@ namespace AnythingGalleryModManager
 
             foreach (string depFile in Directory.EnumerateFiles("manager-hook", "*.deps.json", SearchOption.TopDirectoryOnly))
                 InstallDependencies(depFile);
-            
+
+            if (!Directory.Exists(Path.Combine(GamePath, "mod_deps")))
+                Directory.CreateDirectory(Path.Combine(GamePath, "mod_deps"));
+
             File.Copy(Path.Combine("manager-hook", "MMHOOK_Assembly-CSharp.dll"), Path.Combine(GamePath, "mod_deps", "MMHOOK_Assembly-CSharp.dll"), true);
             
             foreach (string depFile in Directory.EnumerateFiles("manager-hook", "AnythingGalleryLoader.*", SearchOption.TopDirectoryOnly))

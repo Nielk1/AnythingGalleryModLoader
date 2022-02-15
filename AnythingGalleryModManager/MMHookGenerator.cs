@@ -10,10 +10,8 @@ namespace AnythingGalleryModManager
 {
     public static class MMHookGenerator
     {
-        public static bool GenerateMMHook(string input, string mmhookFolder, string GamePath)
+        public static bool GenerateMMHook(string input, string output, string GamePath)
         {
-            string output = Path.Combine(mmhookFolder, $"MMHOOK_{Path.GetFileName(input)}");
-
             //Log.LogMessage(MessageImportance.High, $"Generating MMHOOK of {input}.");
 
             MonoModder modder = new MonoModder();
