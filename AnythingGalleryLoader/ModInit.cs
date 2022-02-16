@@ -69,6 +69,7 @@ namespace AnythingGalleryLoader
                     On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
 
                     On.RequestManager.Show += RequestManager_Show;
+                    On.Jigsaw.Tile.Overlaps_Tile += Tile_Overlaps_Tile;
                 }).Start();
 
                 try
@@ -152,9 +153,44 @@ namespace AnythingGalleryLoader
             }
         }
 
-        private static void PlayerController_Start(On.PlayerController.orig_Start orig, PlayerController self)
+        // Fix for rooms overlapping, the overlap check function was not checking for overlaps with a fixed height, so different level rooms could overlap
+        // A better fix for this would be to alter the prefabs to have 8 corners instead of 4 but that would require modding the prefabs
+        private static bool Tile_Overlaps_Tile(On.Jigsaw.Tile.orig_Overlaps_Tile orig, Jigsaw.Tile self, Jigsaw.Tile other)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            for (int i = 0; i < self.boundVerticesParent.childCount - 1; i++)
+            {
+                Vector3 position = self.boundVerticesParent.GetChild(i).position;
+				position.y = 0f;
+                Vector3 position2 = self.boundVerticesParent.GetChild(i + 1).position;
+				position2.y = 0f;
+                for (int j = 0; j < other.boundVerticesParent.childCount - 1; j++)
+                {
+                    Vector3 position3 = other.boundVerticesParent.GetChild(j).position;
+                    position3.y = 0f;
+                    Vector3 position4 = other.boundVerticesParent.GetChild(j + 1).position;
+                    position4.y = 0f;
+                    if (self.Intersects(position, position2, position3, position4))
+                    {
+                        return true;
+                    }
+                }
+            }
+            for (int k = 0; k < other.boundVerticesParent.childCount; k++)
+            {
+                if (self.Contains(other.boundVerticesParent.GetChild(k).position))
+                {
+                    return true;
+                }
+            }
+            for (int l = 0; l < self.boundVerticesParent.childCount; l++)
+            {
+                if (other.Contains(self.boundVerticesParent.GetChild(l).position))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static void RequestManager_Show(On.RequestManager.orig_Show orig, bool visible)
