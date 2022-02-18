@@ -43,6 +43,7 @@ namespace AnythingGalleryLoader
         static List<IRelatedScanner> RelatedScanners = new List<IRelatedScanner>();
         static List<IInfoScanner> InfoScanners = new List<IInfoScanner>();
 
+
         private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             // You have to wait until Unity is loaded before interacting with it.
@@ -69,7 +70,10 @@ namespace AnythingGalleryLoader
                     On.VideoScraper.StartNewQuery += VideoScraper_StartNewQuery;
 
                     On.RequestManager.Show += RequestManager_Show;
+
                     On.Jigsaw.Tile.Overlaps_Tile += Tile_Overlaps_Tile;
+
+                    On.Jigsaw.Connector.Start += Connector_Start;
                 }).Start();
 
                 try
@@ -153,6 +157,72 @@ namespace AnythingGalleryLoader
             }
         }
 
+        static bool TileSetupComplete = false;
+        static Dictionary<string, Jigsaw.Tileset> TileSets = new Dictionary<string, Jigsaw.Tileset>();
+        static Dictionary<string, Dictionary<string, int>> TileScannerCounts = new Dictionary<string, Dictionary<string, int>>()
+        {
+            { "Hallway_01",                   new Dictionary<string, int>(){ { "image"  , 2 } } },
+            { "Hallway_02",                   new Dictionary<string, int>(){ { "image"  , 1 }, { "info", 1 } } },
+            { "Hallway_03",                   new Dictionary<string, int>(){ { "image"  , 3 }, { "info", 1 } } },
+            { "RelatedExhibitionEntrance_01", new Dictionary<string, int>(){ { "related", 1 } } },
+            { "ViewingArea_01",               new Dictionary<string, int>(){ { "image"  , 2 }, { "info", 1 } } },
+            { "Staircase_01",                 new Dictionary<string, int>(){ { "image"  , 2 } } },
+            { "RelatedExhibitionEntrance_02", new Dictionary<string, int>(){ { "related", 1 } } },
+            { "Cinema",                       new Dictionary<string, int>(){ { "video"  , 1 } } },
+        };
+        private static void Connector_Start(On.Jigsaw.Connector.orig_Start orig, Jigsaw.Connector self)
+        {
+            // this should only get triggered during initial startup of the main level, so we will get the tileset object from the connectors on the starting room
+            if (!TileSetupComplete && self.possibleTilesets != null)
+            {
+                for (int i = 0; i < self.possibleTilesets.Length; i++)
+                {
+                    TileSets[self.possibleTilesets[i].name] = self.possibleTilesets[i];
+                    //for (int j = 0; j < self.possibleTilesets[i].tiles.Length; j++)
+                    //{}
+                }
+
+                // load additional tilesets here
+
+
+
+                // remove tiles from sets that have no valid scanners for them
+                foreach (Jigsaw.Tileset set in TileSets.Values.ToList())
+                {
+                    List<Jigsaw.Tile> setTiles = new List<Jigsaw.Tile>();
+                    foreach (Jigsaw.Tile tile in set.tiles.ToList())
+                    {
+                        if (TileScannerCounts.ContainsKey(tile.name))
+                        {
+                            bool usable = false;
+                            foreach (string key in TileScannerCounts[tile.name].Keys)
+                            {
+                                switch(key)
+                                {
+                                    case "image": if (TileScannerCounts[tile.name][key] > 0 && ImageScanners.Count > 0) usable = true; break;
+                                    case "video": if (TileScannerCounts[tile.name][key] > 0 && VideoScanners.Count > 0) usable = true; break;
+                                    case "related": if (TileScannerCounts[tile.name][key] > 0 && RelatedScanners.Count > 0) usable = true; break;
+                                    case "info": if (TileScannerCounts[tile.name][key] > 0 && InfoScanners.Count > 0) usable = true; break;
+                                }
+                                if (usable)
+                                    break;
+                            }
+                            if(usable)
+                                setTiles.Add(tile);
+                        }
+                        else
+                        {
+                            setTiles.Add(tile);
+                        }
+                    }
+                    set.tiles = setTiles.ToArray();
+                }
+                TileSetupComplete = true;
+            }
+            orig(self);
+        }
+
+        // TODO This didn't work, so the entire intersect and check system needs a fix.  Issue seems to involve A-B-C where C double back over A.
         // Fix for rooms overlapping, the overlap check function was not checking for overlaps with a fixed height, so different level rooms could overlap
         // A better fix for this would be to alter the prefabs to have 8 corners instead of 4 but that would require modding the prefabs
         private static bool Tile_Overlaps_Tile(On.Jigsaw.Tile.orig_Overlaps_Tile orig, Jigsaw.Tile self, Jigsaw.Tile other)
