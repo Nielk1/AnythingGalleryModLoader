@@ -84,7 +84,6 @@ namespace YouTubeScanner
             StringBuilder outputE = new StringBuilder();
 
             {
-                //Process proc = GetProc($"--user-agent \"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\" --dump-single-json \"{url.Replace("\"", "\"\"")}\"");
                 Process proc = GetProc($"--dump-single-json \"{url.Replace("\"", "\"\"")}\"");
                 proc.Start();
 
@@ -108,16 +107,9 @@ namespace YouTubeScanner
             }
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
-            //settings.MissingMemberHandling = MissingMemberHandling.Error;
 
-            //try
-            {
-                YoutubeDlVideo val = JsonConvert.DeserializeObject<YoutubeDlVideo>(outputText, settings);
-                return val;
-            }
-            //catch (Exception ex)
-            //{
-            //}
+            YoutubeDlVideo val = JsonConvert.DeserializeObject<YoutubeDlVideo>(outputText, settings);
+            return val;
         }
     }
 

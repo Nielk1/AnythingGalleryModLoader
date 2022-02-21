@@ -22,6 +22,7 @@ namespace YouTubeScanner
         private YoutubeDlContext ytdl;
         private bool ytdl_updated;
         private bool ytdl_busy;
+        private HashSet<string> AlreadyLoaded = new HashSet<string>();
 
         #region Scanner
         public YouTubeScanner()
@@ -70,7 +71,10 @@ namespace YouTubeScanner
                 }
                 if (urlIdx >= directUrls.Count)
                 {
-                    urlIdx = 0;
+                    //urlIdx = 0;
+                    url = string.Empty;
+                    title = string.Empty;
+                    return false;
                 }
                 int index = urlIdx++;
                 url = directUrls[index].VideoUrl;
@@ -82,20 +86,19 @@ namespace YouTubeScanner
 
         private void UpdateYtDl()
         {
-            //AnythingGalleryLoader.ModInit.VideoScraper_StartCoroutine(UpdateYtDlCo());
             new Thread(() => UpdateYtDlCo()).Start();
         }
 
-        private /*IEnumerator*/ void UpdateYtDlCo()
+        private void UpdateYtDlCo()
         {
             ytdl.Update();
             ytdl_updated = true;
             ytdl_busy = false;
-            //yield break;
         }
 
         private void LoadUrls(string query)
         {
+            AlreadyLoaded.Clear();
             videoUrls.Clear();
             lock (directUrls)
                 directUrls.Clear();
@@ -124,7 +127,11 @@ namespace YouTubeScanner
                         string Title = Regex.Match(item.Value, "\"title\":{\"runs\":\\[{\"text\":\"(.*?)\"}\\]").Value;
                         Title = Title.Replace("\"title\":{\"runs\":[{\"text\":\"", string.Empty);
                         Title = Title.Replace("\"}]", string.Empty);
-                        videoUrls.Enqueue(("http://www.youtube.com" + Url, Title));
+                        if (!AlreadyLoaded.Contains(Url))
+                        {
+                            AlreadyLoaded.Add(Url);
+                            videoUrls.Enqueue(("http://www.youtube.com" + Url, Title));
+                        }
                     }
                 }
             }

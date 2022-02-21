@@ -179,12 +179,16 @@ namespace GoogleImageScanner
         private void FinishedResponse(IAsyncResult result)
         {
             string empty = string.Empty;
-            IHtmlDocument doc;
+            IHtmlDocument doc = null;
             using (HttpWebResponse httpWebResponse = (HttpWebResponse)request.EndGetResponse(result))
             using (Stream stream = httpWebResponse.GetResponseStream())
             {
-                var parser = new HtmlParser();//System.ArgumentException
-                doc = parser.ParseDocument(stream);
+                var parser = new HtmlParser();
+                try
+                {
+                    doc = parser.ParseDocument(stream);
+                }
+                catch (System.ArgumentException) { }
             }
             if (doc != null)
             {

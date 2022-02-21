@@ -73,7 +73,8 @@ namespace AnythingGalleryLoader
 
                     On.RequestManager.Show += RequestManager_Show;
 
-                    On.Jigsaw.Tile.Overlaps_Tile += Tile_Overlaps_Tile;
+                    // This doesn't seem to actually fix the issue, so disabled it for now
+                    //On.Jigsaw.Tile.Overlaps_Tile += Tile_Overlaps_Tile;
 
                     On.Jigsaw.Connector.Start += Connector_Start;
                 }).Start();
