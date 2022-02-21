@@ -43,6 +43,8 @@ namespace AnythingGalleryLoader
         static List<IRelatedScanner> RelatedScanners = new List<IRelatedScanner>();
         static List<IInfoScanner> InfoScanners = new List<IInfoScanner>();
 
+        static List<ITileset> TilesetManagers = new List<ITileset>();
+
 
         private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
@@ -106,10 +108,7 @@ namespace AnythingGalleryLoader
                                 //if (!item.IsClass) continue;
                                 if (item.GetInterfaces().Contains(typeof(IScanner)))
                                 {
-                                    if (!LoadedAssembly)
-                                    {
-                                        LoadedAssembly = true;
-                                    }
+                                    LoadedAssembly = true;
                                     ConstructorInfo[] cons = item.GetConstructors();
                                     foreach (ConstructorInfo con in cons)
                                     {
@@ -139,6 +138,30 @@ namespace AnythingGalleryLoader
                                                 // not sure what the deal is with differnt update triggers, so we're ggoing to stuff video only providers into the video scanner update event to be safe
                                                 VideoScanUpdateEvent.Add(scannerObject);
                                             }
+
+                                            break;
+                                        }
+                                        catch { }
+                                    }
+                                }
+                                if (item.GetInterfaces().Contains(typeof(ITileset)))
+                                {
+                                    LoadedAssembly = true;
+                                    ConstructorInfo[] cons = item.GetConstructors();
+                                    foreach (ConstructorInfo con in cons)
+                                    {
+                                        try
+                                        {
+                                            ParameterInfo[] @params = con.GetParameters();
+                                            object[] paramList = new object[@params.Length];
+                                            // don't worry about paramaters for now
+                                            //for (int i = 0; i < @params.Length; i++)
+                                            //{
+                                            //    paramList[i] = ServiceProvider.GetService(@params[i].ParameterType);
+                                            //}
+
+                                            ITileset tilesetDescription = (ITileset)Activator.CreateInstance(item, paramList);
+                                            TilesetManagers.Add(tilesetDescription);
 
                                             break;
                                         }
@@ -182,22 +205,76 @@ namespace AnythingGalleryLoader
                     //{}
                 }
 
-                // load additional tilesets here
+                // // load additional tilesets here
+                // var testbundle = AssetUtils.LoadAssetBundleFromResources("newrooms_modernagallery", typeof(ModInit).Assembly);
+                // var testgameobject = testbundle.LoadAsset<GameObject>("Entrance_01");
+                // //ItemManager.Instance.AddItem(new CustomItem(testgameobject, fixReference: true));
+                // testgameobject.FixReferences(true);
+                // Jigsaw.Tile testtile = testgameobject.GetComponent<Jigsaw.Tile>();
+                // testbundle.Unload(false);
+                Dictionary<string, AssetBundle> AssetCache = new Dictionary<string, AssetBundle>();
+                //Dictionary<string, Jigsaw.Tile> TileCache = new Dictionary<string, Jigsaw.Tile>();
+                HashSet<TileData> NewTiles = new HashSet<TileData>();
+                Dictionary<string, HashSet<Jigsaw.Tile>> TileToSetMap = new Dictionary<string, HashSet<Jigsaw.Tile>>();
+                foreach (ITileset set in TilesetManagers)
+                {
+                    string key = set.GetType().Assembly.FullName + ":" + set.ResourceName;
+                    if (!AssetCache.ContainsKey(key))
+                        AssetCache[key] = AssetUtils.LoadAssetBundleFromResources(set.ResourceName, set.GetType().Assembly);
 
+                    foreach (TileData tdata in set.Tiles)
+                    {
+                        if (!TileScannerCounts.ContainsKey(tdata.Name))
+                            TileScannerCounts[tdata.Name] = new Dictionary<string, int>();
+                        if (tdata.ScannerCounts != null)
+                            foreach (var kv in tdata.ScannerCounts)
+                                if (!TileScannerCounts[tdata.Name].ContainsKey(kv.Key))
+                                    TileScannerCounts[tdata.Name][kv.Key] = kv.Value;
 
+                        GameObject newRoom = AssetCache[key].LoadAsset<GameObject>(tdata.Name);
+                        newRoom.FixReferences(true);
+                        set.AttachMissingComponents(newRoom);
+                        Jigsaw.Tile newTile = newRoom.GetComponent<Jigsaw.Tile>();
+                        NewTiles.Add(tdata);
+                        //TileCache[tdata.Name] = newTile;
 
-                // remove tiles from sets that have no valid scanners for them
+                        foreach (Jigsaw.Connector con in newTile.connectors)
+                        {
+                            for (int i = 0; i < con.possibleTilesets.Length; i++)
+                            {
+                                if (!TileSets.ContainsKey(con.possibleTilesets[i].name))
+                                    TileSets[con.possibleTilesets[i].name] = con.possibleTilesets[i];
+                                if (!TileToSetMap.ContainsKey(con.possibleTilesets[i].name))
+                                    TileToSetMap[con.possibleTilesets[i].name] = new HashSet<Jigsaw.Tile>();
+                                TileToSetMap[con.possibleTilesets[i].name].Add(newTile);
+                            }
+                        }
+                    }
+                }
+
+                // unload all the bundles we loaded
+                foreach (var ac in AssetCache)
+                    ac.Value.Unload(false);
+
                 foreach (Jigsaw.Tileset set in TileSets.Values.ToList())
                 {
                     List<Jigsaw.Tile> setTiles = new List<Jigsaw.Tile>();
+
+                    HashSet<Jigsaw.Tile> tilesToCheck = TileToSetMap.ContainsKey(set.name) ? TileToSetMap[set.name] : new HashSet<Jigsaw.Tile>();
                     foreach (Jigsaw.Tile tile in set.tiles.ToList())
+                        tilesToCheck.Add(tile);
+
+                    // remove tiles from sets that have no valid scanners for them
+                    foreach (Jigsaw.Tile tile in tilesToCheck)
                     {
                         if (TileScannerCounts.ContainsKey(tile.name))
                         {
                             bool usable = false;
+                            bool hadAnyKeys = false;
                             foreach (string key in TileScannerCounts[tile.name].Keys)
                             {
-                                switch(key)
+                                hadAnyKeys = true;
+                                switch (key)
                                 {
                                     case "image": if (TileScannerCounts[tile.name][key] > 0 && ImageScanners.Count > 0) usable = true; break;
                                     case "video": if (TileScannerCounts[tile.name][key] > 0 && VideoScanners.Count > 0) usable = true; break;
@@ -207,7 +284,7 @@ namespace AnythingGalleryLoader
                                 if (usable)
                                     break;
                             }
-                            if(usable)
+                            if(usable || !hadAnyKeys)
                                 setTiles.Add(tile);
                         }
                         else
@@ -215,6 +292,14 @@ namespace AnythingGalleryLoader
                             setTiles.Add(tile);
                         }
                     }
+
+                    // add test tile
+                    //if (set.name == "ModernGallery")
+                    //{
+                    //    setTiles.Add(testtile);
+                    //}
+
+                    // swap out tile list for new tile list
                     set.tiles = setTiles.ToArray();
                 }
                 TileSetupComplete = true;

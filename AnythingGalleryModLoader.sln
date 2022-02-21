@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchiveOrgScanner", "Archiv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnythingGalleryModManager", "AnythingGalleryModManager\AnythingGalleryModManager.csproj", "{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackroomsTileset", "BackroomsTileset\BackroomsTileset.csproj", "{FEEDB9C0-1D0A-4725-B4B7-EE40BF8F30BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F3E3FA0-7D50-456F-BDD8-CC9452E8D33C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEEDB9C0-1D0A-4725-B4B7-EE40BF8F30BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEEDB9C0-1D0A-4725-B4B7-EE40BF8F30BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEEDB9C0-1D0A-4725-B4B7-EE40BF8F30BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEEDB9C0-1D0A-4725-B4B7-EE40BF8F30BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +58,7 @@ Global
 		{DB0836F9-566E-4624-B717-C1687C36CF0E} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
 		{302A4FFB-622E-4184-988A-8B2CD11A191A} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
 		{2A429D79-31EF-4327-B9D8-3DE492A1D919} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
+		{FEEDB9C0-1D0A-4725-B4B7-EE40BF8F30BE} = {7F19D693-7F8D-4D0F-B398-9D80F51B59A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F7B67C42-A782-4425-A255-6CA0248EBFB3}
