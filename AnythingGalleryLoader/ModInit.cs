@@ -196,116 +196,126 @@ namespace AnythingGalleryLoader
         };
         private static void Connector_Start(On.Jigsaw.Connector.orig_Start orig, Jigsaw.Connector self)
         {
-            // this should only get triggered during initial startup of the main level, so we will get the tileset object from the connectors on the starting room
-            if (!TileSetupComplete && self.possibleTilesets != null)
+            try
             {
-                for (int i = 0; i < self.possibleTilesets.Length; i++)
+                // this should only get triggered during initial startup of the main level, so we will get the tileset object from the connectors on the starting room
+                if (!TileSetupComplete && self.possibleTilesets != null)
                 {
-                    TileSets[self.possibleTilesets[i].name] = self.possibleTilesets[i];
-                    //for (int j = 0; j < self.possibleTilesets[i].tiles.Length; j++)
-                    //{}
-                }
-
-                // // load additional tilesets here
-                // var testbundle = AssetUtils.LoadAssetBundleFromResources("newrooms_modernagallery", typeof(ModInit).Assembly);
-                // var testgameobject = testbundle.LoadAsset<GameObject>("Entrance_01");
-                // //ItemManager.Instance.AddItem(new CustomItem(testgameobject, fixReference: true));
-                // testgameobject.FixReferences(true);
-                // Jigsaw.Tile testtile = testgameobject.GetComponent<Jigsaw.Tile>();
-                // testbundle.Unload(false);
-                Dictionary<string, AssetBundle> AssetCache = new Dictionary<string, AssetBundle>();
-                //Dictionary<string, Jigsaw.Tile> TileCache = new Dictionary<string, Jigsaw.Tile>();
-                HashSet<TileData> NewTiles = new HashSet<TileData>();
-                Dictionary<string, HashSet<Jigsaw.Tile>> TileToSetMap = new Dictionary<string, HashSet<Jigsaw.Tile>>();
-                foreach (ITileset set in TilesetManagers)
-                {
-                    string key = set.GetType().Assembly.FullName + ":" + set.ResourceName;
-                    if (!AssetCache.ContainsKey(key))
-                        AssetCache[key] = AssetUtils.LoadAssetBundleFromResources(set.ResourceName, set.GetType().Assembly);
-
-                    foreach (TileData tdata in set.Tiles)
+                    for (int i = 0; i < self.possibleTilesets.Length; i++)
                     {
-                        if (!TileScannerCounts.ContainsKey(tdata.Name))
-                            TileScannerCounts[tdata.Name] = new Dictionary<string, int>();
-                        if (tdata.ScannerCounts != null)
-                            foreach (var kv in tdata.ScannerCounts)
-                                if (!TileScannerCounts[tdata.Name].ContainsKey(kv.Key))
-                                    TileScannerCounts[tdata.Name][kv.Key] = kv.Value;
-
-                        GameObject newRoom = AssetCache[key].LoadAsset<GameObject>(tdata.Name);
-                        newRoom.FixReferences(true);
-                        set.AttachMissingComponents(newRoom);
-                        Jigsaw.Tile newTile = newRoom.GetComponent<Jigsaw.Tile>();
-                        NewTiles.Add(tdata);
-                        //TileCache[tdata.Name] = newTile;
-
-                        foreach (Jigsaw.Connector con in newTile.connectors)
-                        {
-                            for (int i = 0; i < con.possibleTilesets.Length; i++)
-                            {
-                                if (!TileSets.ContainsKey(con.possibleTilesets[i].name))
-                                    TileSets[con.possibleTilesets[i].name] = con.possibleTilesets[i];
-                                if (!TileToSetMap.ContainsKey(con.possibleTilesets[i].name))
-                                    TileToSetMap[con.possibleTilesets[i].name] = new HashSet<Jigsaw.Tile>();
-                                TileToSetMap[con.possibleTilesets[i].name].Add(newTile);
-                            }
-                        }
+                        TileSets[self.possibleTilesets[i].name] = self.possibleTilesets[i];
+                        //for (int j = 0; j < self.possibleTilesets[i].tiles.Length; j++)
+                        //{}
                     }
-                }
 
-                // unload all the bundles we loaded
-                foreach (var ac in AssetCache)
-                    ac.Value.Unload(false);
-
-                foreach (Jigsaw.Tileset set in TileSets.Values.ToList())
-                {
-                    List<Jigsaw.Tile> setTiles = new List<Jigsaw.Tile>();
-
-                    HashSet<Jigsaw.Tile> tilesToCheck = TileToSetMap.ContainsKey(set.name) ? TileToSetMap[set.name] : new HashSet<Jigsaw.Tile>();
-                    foreach (Jigsaw.Tile tile in set.tiles.ToList())
-                        tilesToCheck.Add(tile);
-
-                    // remove tiles from sets that have no valid scanners for them
-                    foreach (Jigsaw.Tile tile in tilesToCheck)
+                    // // load additional tilesets here
+                    // var testbundle = AssetUtils.LoadAssetBundleFromResources("newrooms_modernagallery", typeof(ModInit).Assembly);
+                    // var testgameobject = testbundle.LoadAsset<GameObject>("Entrance_01");
+                    // //ItemManager.Instance.AddItem(new CustomItem(testgameobject, fixReference: true));
+                    // testgameobject.FixReferences(true);
+                    // Jigsaw.Tile testtile = testgameobject.GetComponent<Jigsaw.Tile>();
+                    // testbundle.Unload(false);
+                    Dictionary<string, AssetBundle> AssetCache = new Dictionary<string, AssetBundle>();
+                    //Dictionary<string, Jigsaw.Tile> TileCache = new Dictionary<string, Jigsaw.Tile>();
+                    HashSet<TileData> NewTiles = new HashSet<TileData>();
+                    Dictionary<string, HashSet<Jigsaw.Tile>> TileToSetMap = new Dictionary<string, HashSet<Jigsaw.Tile>>();
+                    foreach (ITileset set in TilesetManagers)
                     {
-                        if (TileScannerCounts.ContainsKey(tile.name))
+                        string key = set.GetType().Assembly.FullName + ":" + set.ResourceName;
+                        if (!AssetCache.ContainsKey(key))
+                            AssetCache[key] = AssetUtils.LoadAssetBundleFromResources(set.ResourceName, set.GetType().Assembly);
+
+                        foreach (TileData tdata in set.Tiles)
                         {
-                            bool usable = false;
-                            bool hadAnyKeys = false;
-                            foreach (string key in TileScannerCounts[tile.name].Keys)
+                            if (!TileScannerCounts.ContainsKey(tdata.Name))
+                                TileScannerCounts[tdata.Name] = new Dictionary<string, int>();
+                            if (tdata.ScannerCounts != null)
+                                foreach (var kv in tdata.ScannerCounts)
+                                    if (!TileScannerCounts[tdata.Name].ContainsKey(kv.Key))
+                                        TileScannerCounts[tdata.Name][kv.Key] = kv.Value;
+
+                            GameObject newRoom = AssetCache[key].LoadAsset<GameObject>(tdata.Name);
+                            newRoom.FixReferences(true);
+                            set.AttachMissingComponents(newRoom);
+                            Jigsaw.Tile newTile = newRoom.GetComponent<Jigsaw.Tile>();
+                            NewTiles.Add(tdata);
+                            //TileCache[tdata.Name] = newTile;
+
+                            foreach (Jigsaw.Connector con in newTile.connectors)
                             {
-                                hadAnyKeys = true;
-                                switch (key)
+                                for (int i = 0; i < con.possibleTilesets.Length; i++)
                                 {
-                                    case "image": if (TileScannerCounts[tile.name][key] > 0 && ImageScanners.Count > 0) usable = true; break;
-                                    case "video": if (TileScannerCounts[tile.name][key] > 0 && VideoScanners.Count > 0) usable = true; break;
-                                    case "related": if (TileScannerCounts[tile.name][key] > 0 && RelatedScanners.Count > 0) usable = true; break;
-                                    case "info": if (TileScannerCounts[tile.name][key] > 0 && InfoScanners.Count > 0) usable = true; break;
+                                    if (!TileSets.ContainsKey(con.possibleTilesets[i].name))
+                                        TileSets[con.possibleTilesets[i].name] = con.possibleTilesets[i];
+                                    if (!TileToSetMap.ContainsKey(con.possibleTilesets[i].name))
+                                        TileToSetMap[con.possibleTilesets[i].name] = new HashSet<Jigsaw.Tile>();
+                                    TileToSetMap[con.possibleTilesets[i].name].Add(newTile);
                                 }
-                                if (usable)
-                                    break;
                             }
-                            if(usable || !hadAnyKeys)
-                                setTiles.Add(tile);
-                        }
-                        else
-                        {
-                            setTiles.Add(tile);
                         }
                     }
 
-                    // add test tile
-                    //if (set.name == "ModernGallery")
-                    //{
-                    //    setTiles.Add(testtile);
-                    //}
+                    // unload all the bundles we loaded
+                    foreach (var ac in AssetCache)
+                        ac.Value.Unload(false);
 
-                    // swap out tile list for new tile list
-                    set.tiles = setTiles.ToArray();
+                    foreach (Jigsaw.Tileset set in TileSets.Values.ToList())
+                    {
+                        List<Jigsaw.Tile> setTiles = new List<Jigsaw.Tile>();
+
+                        HashSet<Jigsaw.Tile> tilesToCheck = TileToSetMap.ContainsKey(set.name) ? TileToSetMap[set.name] : new HashSet<Jigsaw.Tile>();
+                        foreach (Jigsaw.Tile tile in set.tiles.ToList())
+                            tilesToCheck.Add(tile);
+
+                        // remove tiles from sets that have no valid scanners for them
+                        foreach (Jigsaw.Tile tile in tilesToCheck)
+                        {
+                            if (TileScannerCounts.ContainsKey(tile.name))
+                            {
+                                bool usable = false;
+                                bool hadAnyKeys = false;
+                                foreach (string key in TileScannerCounts[tile.name].Keys)
+                                {
+                                    hadAnyKeys = true;
+                                    switch (key)
+                                    {
+                                        case "image": if (TileScannerCounts[tile.name][key] > 0 && ImageScanners.Count > 0) usable = true; break;
+                                        case "video": if (TileScannerCounts[tile.name][key] > 0 && VideoScanners.Count > 0) usable = true; break;
+                                        case "related": if (TileScannerCounts[tile.name][key] > 0 && RelatedScanners.Count > 0) usable = true; break;
+                                        case "info": if (TileScannerCounts[tile.name][key] > 0 && InfoScanners.Count > 0) usable = true; break;
+                                    }
+                                    if (usable)
+                                        break;
+                                }
+                                if (usable || !hadAnyKeys)
+                                    setTiles.Add(tile);
+                            }
+                            else
+                            {
+                                setTiles.Add(tile);
+                            }
+                        }
+
+                        // add test tile
+                        //if (set.name == "ModernGallery")
+                        //{
+                        //    setTiles.Add(testtile);
+                        //}
+
+                        // swap out tile list for new tile list
+                        set.tiles = setTiles.ToArray();
+                    }
+                    TileSetupComplete = true;
                 }
-                TileSetupComplete = true;
             }
-            orig(self);
+            catch(Exception ex)
+            {
+                Debug.LogError(ex);
+            }
+            finally
+            {
+                orig(self);
+            }
         }
 
         // TODO This didn't work, so the entire intersect and check system needs a fix.  Issue seems to involve A-B-C where C double back over A.

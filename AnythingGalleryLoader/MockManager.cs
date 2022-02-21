@@ -257,39 +257,48 @@ namespace AnythingGalleryLoader.Managers
                     switch (unityObject.name)
                     {
                         case "Plane.002":
-                            switch (unityObject.GetInstanceID())
+                            //switch (unityObject.GetInstanceID())
+                            switch ((unityObject as Mesh)?.vertexCount ?? -1)
                             {
-                                case 2258: map["Plane.002"] = unityObject; break;
-                                case 2260: map["PlaneFern"] = unityObject; break;
+                                //case 2258: map["Plane.002"] = unityObject; break;
+                                case 14: map["Plane.002"] = unityObject; break;
+                                //case 2260: map["PlaneFern"] = unityObject; break;
+                                case 108: map["PlaneFern"] = unityObject; break;
                                 default:
-                                    Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} over {map[unityObject.name].GetInstanceID()}");
+                                    Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} (Verts:{(unityObject as Mesh)?.vertexCount}) over {(map.ContainsKey(unityObject.name) ? map[unityObject.name].GetInstanceID() : -1)}");
                                     break;
                             }
                             break;
                         case "Cube":
-                            switch (unityObject.GetInstanceID())
+                            switch ((unityObject as Mesh)?.vertexCount ?? -1)
+                            //switch (unityObject.GetInstanceID())
                             {
-                                case 2230: map["CubeSign"] = unityObject; break;
-                                case 2232: map["Cube"] = unityObject; break;
+                                //case 2230: map["CubeSign"] = unityObject; break;
+                                case 20: map["CubeSign"] = unityObject; break;
+                                //case 2232: map["Cube"] = unityObject; break;
+                                case 108: map["Cube"] = unityObject; break;
                                 default:
-                                    Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} over {map[unityObject.name].GetInstanceID()}");
+                                    Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} (Verts:{(unityObject as Mesh)?.vertexCount}) over {(map.ContainsKey(unityObject.name) ? map[unityObject.name].GetInstanceID() : -1)}");
                                     break;
                             }
                             break;
                         case "Plane.003":
-                            switch (unityObject.GetInstanceID())
+                            switch ((unityObject as Mesh)?.vertexCount ?? -1)
+                            //switch (unityObject.GetInstanceID())
                             {
-                                case 2222: map["PlaneGrass"] = unityObject; break;
-                                case 2224: map["Plane.003"] = unityObject; break;
+                                //case 2222: map["PlaneGrass"] = unityObject; break;
+                                case 84: map["PlaneGrass"] = unityObject; break;
+                                //case 2224: map["Plane.003"] = unityObject; break;
+                                case 28: map["Plane.003"] = unityObject; break;
                                 default:
-                                    Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} over {map[unityObject.name].GetInstanceID()}");
+                                    Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} (Verts:{(unityObject as Mesh)?.vertexCount}) over {(map.ContainsKey(unityObject.name) ? map[unityObject.name].GetInstanceID() : -1)}");
                                     break;
                             }
                             break;
                         default:
                             if (map.ContainsKey(unityObject.name))
                             {
-                                Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} over {map[unityObject.name].GetInstanceID()}");
+                                Debug.Log($"Collision {type.Name} \"{unityObject.name}\" {unityObject.GetInstanceID()} (Verts:{(unityObject as Mesh)?.vertexCount}) over {(map.ContainsKey(unityObject.name) ? map[unityObject.name].GetInstanceID() : -1)}");
                                 map[unityObject.name] = unityObject;
                             }
                             else
